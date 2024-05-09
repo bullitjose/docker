@@ -2,13 +2,10 @@
 Docker and Kubernetes - Full Course for Beginners AmigosCode
 remove origin!!
 
-git remote -v   
-origin	https://github.com/amigoscode/java-functional-programming.git (fetch)
-origin	https://github.com/amigoscode/java-functional-programming.git (push)
 
 add our new origin, to our github
 
-git remote add origin git@github.com:bullitjose/java-functional-programming.git
+git remote add origin git@github.com:bullitjose/docker
 
 add changes at local to origin, at github
 
