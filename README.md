@@ -191,3 +191,16 @@ Here’s the list of the basic Docker commands that helps you inspect the contai
 |WORKDIR path	|set the default working directory|
 |CMD args.. 	|set the default command|
 |ENV name value	|set an environment variable|
+
+>0009 Docker Images and Containers
+
+How to use this image (wordpress):
+
+[images from hub docker](https://hub.docker.com/_/wordpress)
+```
+$ docker run --name some-wordpress --network some-network -d wordpress
+```
+If you'd like to be able to access the instance from the host without the container's IP, standard port mappings can be used:
+```
+$ docker run --name some-wordpress -p 8080:80 -d wordpress
+```
