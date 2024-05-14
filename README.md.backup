@@ -435,8 +435,27 @@ $docker run --help
 ```
 **run on background mode, for example:**
 ```
-$docker run --name website d -p 8080:80 ngin
+$docker run --name website d -p 8080:80 nginx
+
 ```
 
+>0016_Docker Images
+>0017_Managing Docker Images
+list images, docker image ls:
 
-
+```
+$docker image ls    
+REPOSITORY        TAG       IMAGE ID       CREATED       SIZE
+wordpress         latest    5fb7d355caa4   6 days ago    685MB
+amigoscode/2048   latest    82f9808f239f   2 years ago   135MB
+```
+remove a Image, first remove the container:
+```
+$ docker rm -f 2048 
+```
+then we can remove Image:
+```
+$docker image rm 2048 
+```
+image 2048 will not find locally, we must pull it again
+#$docker rmi 2048# is the same as #$docker image rm 2048#
