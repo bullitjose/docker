@@ -3,23 +3,28 @@ Docker and Kubernetes - Full Course for Beginners AmigosCode
 remove origin!!
 
 
-add our new origin, to our github
-
+add our new origin, to our github:
+```
 git remote add origin git@github.com:bullitjose/docker
+```
 
-add changes at local to origin, at github
+
+add changes at local to origin, at github:
+
 ```
 git push -u origin master
 ```
 
-download changes at github to local
+download changes at github to local:
+
 ```
 git pull origin master
 
 git and github
 ```
 
-    …or create a new repository on the command line
+   …or create a new repository on the command line:
+
 ```
 echo "# testing" >> README.md
 git init
@@ -30,12 +35,29 @@ git remote add origin https://github.com/bullitjose/testing.git
 git push -u origin main
 ```
 
-    …or push an existing repository from the command line
+    …or push an existing repository from the command line:
+
 ```
 git remote add origin https://github.com/bullitjose/testing.git
 git branch -M main
 git push -u origin main
 ```
+
+>Install Docker Desktop
+
+Recommended approach to install Docker Desktop on Ubuntu:
+   1.Set up Docker's package repository. See step one of Install using the apt repository.
+
+   2.Download latest DEB package: [install using the repository](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository)
+
+   3.Install the package with apt as follows:
+   
+```
+ sudo apt-get update
+
+ sudo apt-get install ./docker-desktop-<version>-<arch>.deb
+ ```
+ 
 
 >Launch Docker Desktop
 
@@ -44,7 +66,7 @@ To start Docker Desktop for Linux, search Docker Desktop on the Applications men
 Alternatively, open a terminal and run:
 ```
  systemctl --user start docker-desktop
- ```
+```
  
  After you’ve successfully installed Docker Desktop, you can check the versions of these binaries by running the following commands:
 ```
@@ -62,7 +84,7 @@ Client: Docker Engine - Community
 <...>
 ```
 
-> I opened the terminal to run and igot this error:
+> I opened the terminal to run and i got this error:
 
 ```
 systemctl --user start docker-desktop
@@ -203,4 +225,129 @@ $ docker run --name some-wordpress --network some-network -d wordpress
 If you'd like to be able to access the instance from the host without the container's IP, standard port mappings can be used:
 ```
 $ docker run --name some-wordpress -p 8080:80 -d wordpress
+Unable to find image 'wordpress:latest' locally
+latest: Pulling from library/wordpress
+b0a0cf830b12: Pull complete 
+c93478d47932: Pull complete 
+e74cc574d0d2: Pull complete 
+e4782e138a90: Pull complete 
+cfeec87621ae: Pull complete 
+c1badcd002c0: Pull complete 
+e0d463a60cb6: Pull complete 
+8bce13a727be: Pull complete 
+8cbeca1cab87: Pull complete 
+9216544a8100: Pull complete 
+2b3680ee4acb: Pull complete 
+35fa048d3ad4: Pull complete 
+e8be4124e519: Pull complete 
+7f1beb739060: Pull complete 
+fa118a71e862: Pull complete 
+2769eb42fecf: Pull complete 
+0e93a2a8bf0f: Pull complete 
+638e00bd0917: Pull complete 
+513bffc3d60d: Pull complete 
+ea7798d3fbb1: Pull complete 
+f2eb955eba32: Pull complete 
+Digest: sha256:9ce0773fc5be134b2a2268ccc9e1da8cf9b17a0462259a38a2c85e604c9c02cd
+Status: Downloaded newer image for wordpress:latest
+e70c38d95942eb39ebc4307268bc48732c9b7befc426bf72dcd51d4dd8c5ec34
+
 ```
+ Search at internet:
+ ```
+ http://localhost:8080
+ ```
+ we run wordpress on our machine.
+ 
+ 
+ > running container, docker ps:
+ ```
+  $docker ps -a                  
+  ```
+                            
+|CONTAINER ID|   IMAGE       |COMMAND                  |CREATED         |STATUS         |PORTS                  |NAMES|
+|----|---|---|---|---|---|---|
+|e70c38d95942   |wordpress   |"docker-entrypoint.s…"   |9 minutes ago   |Up 9 minutes   |0.0.0.0:8080->80/tcp   |some-wordpress|
+
+
+>stop contanier, docker stop:
+
+```
+$docker stop e70c38d95942
+e70c38d95942
+$docker ps -a            
+CONTAINER ID   IMAGE       COMMAND                  CREATED          STATUS                     PORTS     NAMES
+e70c38d95942   wordpress   "docker-entrypoint.s…"   10 minutes ago   Exited (0) 2 seconds ago             some-wordpress
+
+```
+
+>remove container, docker rm:
+
+```
+$docker rm e70c38d95942  
+e70c38d95942
+$docker ps -a           
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+```
+>remove container without stopp it, docker rm -f:
+
+```
+$docker rm 00d353764328             
+Error response from daemon: cannot remove container "/some-wordpress": container is running: stop the container before removing or force remove
+$docker rm -f 00d353764328
+00d353764328
+$docker ps -a             
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+```
+
+>0011 Docker ps format
+use a Go template Pretty-print containers:
+
+```
+docker ps --help
+
+Usage:  docker ps [OPTIONS]
+
+List containers
+
+Aliases:
+  docker container ls, docker container list, docker container ps, docker ps
+
+Options:
+  -a, --all             Show all containers (default shows just running)
+  -f, --filter filter   Filter output based on conditions provided
+      --format string   Format output using a custom template:
+                        'table':            Print output in table format with column headers (default)
+                        'table TEMPLATE':   Print output in table format using the given Go template
+                        'json':             Print in JSON format
+                        'TEMPLATE':         Print output using the given Go template.
+                        Refer to https://docs.docker.com/go/formatting/ for more information about formatting output with templates
+  -n, --last int        Show n last created containers (includes all states) (default -1)
+  -l, --latest          Show the latest created container (includes all states)
+      --no-trunc        Don't truncate output
+  -q, --quiet           Only display container IDs
+  -s, --size            Display total file sizes
+```
+
+To get the nicely formatted docker, here is the string:
+```
+$export FORMAT="ID\t{{.ID}}\nNAME\t{{.Names}}\nIMAGE\t{{.Image}}\nPORTS\t{{.Ports}}\nCOMMAND\t{{.Command}}\nCREATED\t{{.CreatedAt}}\nSTATUS\t{{.Status}}\n" 
+```
+Now we use this format:
+```
+$ docker ps --format=$FORMAT
+ID	6dbfbdf677a9
+NAME	some-wordpress
+IMAGE	wordpress
+PORTS	0.0.0.0:8080->80/tcp
+COMMAND	"docker-entrypoint.s…"
+CREATED	2024-05-14 12:53:57 +0200 CEST
+STATUS	Up About a minute
+```
+
+
+
+
+
+
+
