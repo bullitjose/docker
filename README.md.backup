@@ -345,9 +345,98 @@ CREATED	2024-05-14 12:53:57 +0200 CEST
 STATUS	Up About a minute
 ```
 
+>0012_Exposing Ports
 
+At the container we have a app listening on port 80, https:ip-address:80, the first port is the host and second the container, -p 80:80:
+```
+$docker run -p 8081:80 -d wordpress
+Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?.
+```
+**Starts Docker Desktop app's!!**
+```
+ID	5af3b6de6355
+NAME	some-wordpress
+IMAGE	wordpress
+PORTS	0.0.0.0:8080->80/tcp
+COMMAND	"docker-entrypoint.s…"
+CREATED	2024-05-14 17:21:19 +0200 CEST
+STATUS	Up 7 minutes
+```
+**At ports we have: PORTS	0.0.0.0:8080->80/tcp , the host is 0.0.0.0:8080, and ->80 the port of the container**
 
+>0013_Expoxing Multiple Ports
 
+```
+$docker run -p 80:80 -p 5000:80 -p 3000:80 -d amigoscode/2048
+
+$docker ps --format=$FORMAT                                  
+ID	4da8b69e013d
+NAME	festive_agnesi
+IMAGE	amigoscode/2048
+PORTS	0.0.0.0:80->80/tcp, 0.0.0.0:3000->80/tcp, 0.0.0.0:5000->80/tcp
+COMMAND	"/docker-entrypoint.…"
+CREATED	2024-05-14 17:41:13 +0200 CEST
+STATUS	Up 11 seconds
+
+ID	5af3b6de6355
+NAME	some-wordpress
+IMAGE	wordpress
+PORTS	0.0.0.0:8080->80/tcp
+COMMAND	"docker-entrypoint.s…"
+CREATED	2024-05-14 17:21:19 +0200 CEST
+STATUS	Up 20 minutes
+
+```
+
+if we open a browser, we find image of amigoscode at ports 8080 and 3000:
+**(http://localhost:3000/ ) or (http://localhost:80/)**
+
+>0014_Naming Containers
+
+First stop and remove container:
+
+```
+$docker rm -f 4da8b69e013d                
+4da8b69e013d
+```
+Now run container with a name!!
+```
+docker run --name 2048 -p 80:80 -p 8081:80 -d amigoscode/2048
+```
+Lets see containers running:
+```
+$docker ps --format=$FORMAT                                   
+ID	0269529f131c
+NAME	2048
+IMAGE	amigoscode/2048
+PORTS	0.0.0.0:80->80/tcp, 0.0.0.0:8081->80/tcp
+COMMAND	"/docker-entrypoint.…"
+CREATED	2024-05-14 18:08:50 +0200 CEST
+STATUS	Up About a minute
+
+ID	5af3b6de6355
+NAME	some-wordpress
+IMAGE	wordpress
+PORTS	0.0.0.0:8080->80/tcp
+COMMAND	"docker-entrypoint.s…"
+CREATED	2024-05-14 17:21:19 +0200 CEST
+STATUS	Up 48 minutes
+```
+
+>0015_Running Container in the background
+
+let's use the flag -d with run:
+```
+$docker run --help 
+....
+-d, --detach                           Run container in background and
+                                         print container ID
+...
+```
+**run on background mode, for example:**
+```
+$docker run --name website d -p 8080:80 ngin
+```
 
 
 
