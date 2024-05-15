@@ -440,6 +440,7 @@ $docker run --name website d -p 8080:80 nginx
 ```
 
 >0016_Docker Images
+
 >0017_Managing Docker Images
 list images, docker image ls:
 
@@ -458,4 +459,176 @@ then we can remove Image:
 $docker image rm 2048 
 ```
 image 2048 will not find locally, we must pull it again
-#$docker rmi 2048# is the same as #$docker image rm 2048#
+
+**$docker rmi 2048** is the same as **$docker image rm 2048**
+
+>0018_Docker Pull
+
+Pull image without run it.
+```
+$docker pull nginx
+```
+
+>0019_Inspecting Images
+
+```
+$ docker image inspect wordpress
+
+```
+
+>0020_Docker Architecture
+
+![](0020_Docker_Architecture.png)
+
+>0021_Docker Daemon
+
+![](0021_Docker_ Daemon.png)
+
+Where is Docker Daemon:
+```
+$ cd ~/.docker
+.docker$ls    
+buildx       contexts     desktop        features.json  scan
+config.json  daemon.json  desktop-build  mutagen
+```
+here we find **daemon.json**
+```
+cat daemon.json 
+{
+  "builder": {
+    "gc": {
+      "defaultKeepStorage": "20GB",
+      "enabled": true
+    }
+  },
+  "experimental": false
+}
+```
+that's the same as we found at app **Docker Desktop** Docker Engine:
+
+![](0021_Docker_ Daemon_Docker_Engine.png)
+
+Here we can **configure Docker Daemon**
+
+If we quit from app **Docker Desktop** then:
+```
+docker ps                     
+Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?
+```
+**docker.sock is the daemon**
+
+>0022_Volumes
+
+![](0022_Volumes_1.png)
+```
+$docker run bash bash -c "echo foo > bar.txt && cat bar.txt"
+Unable to find image 'bash:latest' locally
+latest: Pulling from library/bash
+4abcf2066143: Pull complete 
+104abb8d8f68: Pull complete 
+58723bf50cb1: Pull complete 
+Digest: sha256:890897682a8025c1e178b5ec6126b3b532ad8535f1e81dbf60bc2b7300b1bcf8
+Status: Downloaded newer image for bash:latest
+foo
+```
+now we can see the new container:
+```
+docker ps -a --format=$FORMAT
+ID	e748dcaa78a1
+NAME	mystifying_poitras
+IMAGE	bash
+PORTS	
+COMMAND	"docker-entrypoint.s…"
+CREATED	2024-05-15 19:05:02 +0200 CEST
+STATUS	Exited (0) 3 minutes ago
+
+ID	0269529f131c
+NAME	2048
+IMAGE	amigoscode/2048
+PORTS	0.0.0.0:80->80/tcp, 0.0.0.0:8081->80/tcp
+COMMAND	"/docker-entrypoint.…"
+CREATED	2024-05-14 18:08:50 +0200 CEST
+STATUS	Exited (255) About an hour ago
+
+ID	5af3b6de6355
+NAME	some-wordpress
+IMAGE	wordpress
+PORTS	0.0.0.0:8080->80/tcp
+COMMAND	"docker-entrypoint.s…"
+CREATED	2024-05-14 17:21:19 +0200 CEST
+STATUS	Exited (255) About an hour ago
+
+```
+IMAGE bash, is where is the **volume** with the bar.txt.
+
+>0023_Bind_Mount_Volumes
+
+![](0023_Bind_Mount_Volumes_1.png)
+
+>0024_Bind_Mount_Volumes_in Action
+
+After $docker run bash bash -c "echo foo > bar.txt && cat bar.txt", 
+```
+$docker run --help 
+
+Usage:  docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
+
+Create and run a new container from an image
+
+....
+
+-v, --volume list                      Bind mount a volume
+      --volume-driver string             Optional volume driver for the container
+      --volumes-from list                Mount volumes from the specified container(s)
+      
+      ...
+```
+we can share data between host and the container with the flag -v, $PWD is pwd of the host, is a path where is the volume:
+```
+$docker run -v $PWD:/tmp bash bash -c "echo foo > /tmp/bar.txt && cat /tmp/bar.txt"
+```
+
+>0025_Using Volumes for Local Dev
+
+download https://startbootstrap.com/theme/sb-admin-2, unzip and rename as dashboard,then inside dashboard:
+```
+dashboard $ docker run --name dashboard -d -p 8080:80 nginx
+Unable to find image 'nginx:latest' locally
+latest: Pulling from library/nginx
+09f376ebb190: Pull complete 
+a11fc495bafd: Pull complete 
+933cc8470577: Pull complete 
+999643392fb7: Pull complete 
+971bb7f4fb12: Pull complete 
+45337c09cd57: Pull complete 
+de3b062c0af7: Pull complete 
+Digest: sha256:a484819eb60211f5299034ac80f6a681b06f89e65866ce91f356ed7c72af059c
+Status: Downloaded newer image for nginx:latest
+0423c95672aa8404c757c3ec19818157e98431ed04e2a23a819d9b043d2539a7
+
+```
+then go to the browser, and type: localhost:8080
+
+![](0025_Using Volumes for local dev_1.png)
+
+lets remove this image:
+```
+dashboard $docker rm -f dashboard   
+dashboard
+
+```
+lets do ls:
+```
+dashboard $ ls
+404.html              index.html         scss
+blank.html            js                 tables.html
+buttons.html          LICENSE            utilities-animation.html
+cards.html            login.html         utilities-border.html
+charts.html           package.json       utilities-color.html
+css                   package-lock.json  utilities-other.html
+forgot-password.html  PRO_UPGRADE.txt    vendor
+gulpfile.js           README.md
+img                   register.html
+
+```
+there is a lot of files,
