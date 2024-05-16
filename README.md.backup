@@ -631,4 +631,92 @@ gulpfile.js           README.md
 img                   register.html
 
 ```
-there is a lot of files,
+there is a lot of files, now inside dashboard, run nginx:
+```
+ ~/Baixades/docker/dashboard $docker run --name dashboard \
+-v "$PWD:/usr/share/nginx/html" -d -p 8080:80 nginx
+50d92db56098ff9d80e21dda6c15dbb653a6a495c2cdc7861fe1d2102d9787c5
+```
+lets see ps:
+```
+Baixades/docker/dashboard $docker ps -a --format=$FORMAT
+ID	50d92db56098
+NAME	dashboard
+IMAGE	nginx
+PORTS	0.0.0.0:8080->80/tcp
+COMMAND	"/docker-entrypoint.…"
+CREATED	2024-05-16 12:28:11 +0200 CEST
+STATUS	Up 2 seconds
+
+```
+lets see the browser how its nginx now:
+
+![](0025_Using Volumes for local dev_2.png)
+
+now  the nginx has the a **free Bootstrap 2 admin theme** built with HTML/CSS
+
+>0026_Docker_Volumes
+
+![Different Types of Volumes](0026_Docker Volumes(Different Types of Volumes).png)
+
+lets see docker volume:
+```
+ ~/Baixades/docker/dashboard $ docker volume --help         
+
+Usage:  docker volume COMMAND
+
+Manage volumes
+
+Commands:
+  create      Create a volume
+  inspect     Display detailed information on one or more volumes
+  ls          List volumes
+  prune       Remove unused local volumes
+  rm          Remove one or more volumes
+
+Run 'docker volume COMMAND --help' for more information on a command.
+
+```
+
+lets create a volume, vol1:
+```
+ ~/Baixades/docker/dashboard $docker volume create vol1
+vol1
+~/Baixades/docker/dashboard $docker volume inspect vol1          
+[
+    {
+        "CreatedAt": "2024-05-16T10:52:23Z",
+        "Driver": "local",
+        "Labels": null,
+        "Mountpoint": "/var/lib/docker/volumes/vol1/_data",
+        "Name": "vol1",
+        "Options": null,
+        "Scope": "local"
+    }
+]
+
+```
+lets see volumes:
+```
+ ~/Baixades/docker/dashboard $ docker volume ls          
+DRIVER    VOLUME NAME
+local     15da86192c89af644d0d419f26f9812cfe52ceb836ae2db4334e9e9525b38fb5
+local     vol1
+
+```
+lets delete vol1:
+```
+ ~/Baixades/docker/dashboard $ docker volume rm vol1 
+vol1
+```
+
+>0027_tmpfs_Mount
+
+![](0027_tmpfs_Mount(Different Types of Volumes).png)
+
+>0028_Dockerfile
+
+![](0028_Docker_File_1.png)
+
+![](0028_Docker_File_2.png)
+
