@@ -720,3 +720,114 @@ vol1
 
 ![](0028_Docker_File_2.png)
 
+>0029_Creating_Dockerfile
+
+create a Dockerfile called "Dockerfile", inside dashboard directory:
+![](0029_Creating_Docker_File.png)
+
+>0030_Building_DockerImages
+
+now Build DockerImages inside dashboard:
+```
+ ~/Baixades/docker/dashboard $ ls
+404.html      forgot-password.html  package.json       utilities-animation.html
+blank.html    gulpfile.js           package-lock.json  utilities-border.html
+buttons.html  img                   PRO_UPGRADE.txt    utilities-color.html
+cards.html    index.html            README.md          utilities-other.html
+charts.html   js                    register.html      vendor
+css           LICENSE               scss
+Dockerfile    login.html            tables.html
+
+```
+there is the Dockerfile we created at 0029, if we have a look:
+```
+ ~/Baixades/docker/dashboard $ cat Dockerfile 
+FROM nginx
+COPY . /usr/share/nginx/html%  
+```
+now, list the images we have:
+```
+docker image ls
+REPOSITORY        TAG       IMAGE ID       CREATED        SIZE
+wordpress         latest    5fb7d355caa4   8 days ago     685MB
+nginx             latest    e784f4560448   12 days ago    188MB
+bash              latest    9eb4e69a801b   4 months ago   14MB
+amigoscode/2048   latest    82f9808f239f   2 years ago    135MB
+
+```
+now lets build docker on dashboard directory, so we use **.** as file path:
+```
+~/Baixades/docker/dashboard $ docker build . -t dashboard
+[+] Building 2.8s (7/7) FINISHED                                  docker:desktop-linux
+ => [internal] load build definition from Dockerfile                              0.1s
+ => => transferring dockerfile: 76B                                               0.0s
+ => [internal] load metadata for docker.io/library/nginx:latest                   0.0s
+ => [internal] load .dockerignore                                                 0.0s
+ => => transferring context: 2B                                                   0.0s
+ => [internal] load build context                                                 1.3s
+ => => transferring context: 18.31MB                                              1.2s
+ => [1/2] FROM docker.io/library/nginx:latest                                     0.5s
+ => [2/2] COPY . /usr/share/nginx/html                                            0.7s
+ => exporting to image                                                            0.5s
+ => => exporting layers                                                           0.4s
+ => => writing image sha256:8147c96d599609b406a821cc8a5887e1cd7a6274d0830ff100c8  0.0s
+ => => naming to docker.io/library/dashboard                                      0.0s
+
+What's Next?
+  1. Sign in to your Docker account → docker login
+  2. View a summary of image vulnerabilities and recommendations → docker scout quickview
+
+```
+lets see docker images:
+```
+ ~/Baixades/docker/dashboard $ docker image ls            
+REPOSITORY        TAG       IMAGE ID       CREATED         SIZE
+dashboard         latest    8147c96d5996   3 minutes ago   206MB
+wordpress         latest    5fb7d355caa4   8 days ago      685MB
+nginx             latest    e784f4560448   12 days ago     188MB
+bash              latest    9eb4e69a801b   4 months ago    14MB
+amigoscode/2048   latest    82f9808f239f   2 years ago     135MB
+
+```
+now we can see new image called **dashboard**
+
+>0031_Running a container from Custom Image.
+
+Now we have a Custom image, lets run it:
+```
+ ~/Baixades/docker/dashboard $ docker ps -a --format=$FORMAT
+ID	50d92db56098
+NAME	dashboard
+IMAGE	nginx
+PORTS	0.0.0.0:8080->80/tcp
+COMMAND	"/docker-entrypoint.…"
+CREATED	2024-05-16 12:28:11 +0200 CEST
+STATUS	Exited (255) 11 minutes ago
+```
+now run  custom image, dashboard, before remove image running:
+```
+~/Baixades/docker/dashboard $ docker rm -f dashboard       
+dashboard
+```
+before we run a image inside "$PWD:/usr/share/nginx/html":
+```
+~/Baixades/docker/dashboard $ docker run --name dashboard \
+-v "$PWD:/usr/share/nginx/html" -d -p 8080:80 nginx
+
+```
+now we don't need mount de volume any more, **because the custom image contains it**:
+```
+ ~/Baixades/docker/dashboard $ docker run --name dashboard -d -p 8080:80 dashboard
+5f9d4d16ae19da13aa2d1de201285a848fc28dcaf8d21349d5dfd258441bfe7a
+
+ ~/Baixades/docker/dashboard $ docker ps -a --format=$FORMAT                      
+ID	5f9d4d16ae19
+NAME	dashboard
+IMAGE	dashboard
+PORTS	0.0.0.0:8080->80/tcp
+COMMAND	"/docker-entrypoint.…"
+CREATED	2024-05-16 20:01:07 +0200 CEST
+STATUS	Up 38 seconds
+
+```
+Image is dashboard
