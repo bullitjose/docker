@@ -831,3 +831,26 @@ STATUS	Up 38 seconds
 
 ```
 Image is dashboard
+
+>0033 Building_ExpresssJS_API
+
+>0034 Dockerfile and Building image for user api
+
+>0035_Running_Container_for_user_api_image
+
+>0036_Exploring_Dockerfiles
+
+![](0036_Exploring_Dockerfiles_1.png)
+
+![](0036_Exploring_Dockerfiles_2.png)
+
+![](0036_Exploring_Dockerfiles_3.png)
+
+![](0036_Exploring_Dockerfiles_4.png)
+
+![](0036_Exploring_Dockerfiles_5.png)
+
+![](0036_Exploring_Dockerfiles_6.png)
+
+
+
