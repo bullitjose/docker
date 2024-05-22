@@ -904,5 +904,17 @@ wordpress    1         5fb7d355caa4   2 weeks ago   685MB
 wordpress    latest    5fb7d355caa4   2 weeks ago   685MB
 ```
 
+>0040_Creating_Version_2_of_the_Dashboard
 
+>0041_Never_Run_Latest_In_Production
+
+**Never use Latest tag of Images, always use tag with a version**
+
+>0042_Image_Variants
+
+Image Variants or flavors, each designed for a specific use case:
+
+![](0042_Image_Variants_1.png)
+
+![](0042_Image_Variants_2.png)
 
