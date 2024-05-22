@@ -852,5 +852,57 @@ Image is dashboard
 
 ![](0036_Exploring_Dockerfiles_6.png)
 
+>0037_DockerFile_Reference
+
+![](0037_DockerFile_Reference.png)
+
+![](0037_DockerFile_Reference_Format.png)
+
+![](0037_DockerFile_Reference_Examples.png)
+
+Best practices for Dockerfile instructions:
+
+![](0037_DockerFile_Reference_Bes_Practices.png)
+
+>0038_Pulling_Images_using_a_Specifc_Tag
+
+How to pull image, for example postgres, go to dockerhub, search postgres Docker official Images:
+
+![](0038_DockerHub_Pull Image.png)
+
+if we pull :
+```
+docker pull postgres
+
+```
+we pull the latest version:
+
+![](0038_DockerHub_Pull latest Image Postgres.png)
+
+```
+ ~/AAA/IT/amigos_code/docker $  master ± $ docker pull postgres
+Using default tag: latest
+latest: Pulling from library/postgres
+~/AAA/IT/amigos_code/docker $  master ± $ docker images       
+REPOSITORY   TAG       IMAGE ID       CREATED       SIZE
+postgres     latest    cff6b68a194a   12 days ago   432MB
+wordpress    latest    5fb7d355caa4   2 weeks ago   685MB
+
+```
+
+
+>0039_Creating_tags
+
+How made tag version 1 base of latest wordpress:
+```
+$docker tag wordpress:latest wordpress:1
+
+$docker images                          
+REPOSITORY   TAG       IMAGE ID       CREATED       SIZE
+postgres     latest    cff6b68a194a   12 days ago   432MB
+wordpress    1         5fb7d355caa4   2 weeks ago   685MB
+wordpress    latest    5fb7d355caa4   2 weeks ago   685MB
+```
+
 
 
