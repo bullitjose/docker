@@ -918,3 +918,242 @@ Image Variants or flavors, each designed for a specific use case:
 
 ![](0042_Image_Variants_2.png)
 
+>0043_Docker_Registries
+
+[DockerHub](https://hub.docker.com/)
+
+[Amazon Elastic Container Registry](https://aws.amazon.com/ecr/)
+
+[GitHub Packages ](https://github.com/features/packages)
+
+>0044_Docker_Login
+```
+$docker login --help          
+Log in to a Docker registry or cloud backend.
+If no registry server is specified, the default is defined by the daemon.
+
+Usage:
+  docker login [OPTIONS] [SERVER] [flags]
+  docker login [command]
+
+Available Commands:
+  azure       Log in to azure
+
+Flags:
+  -h, --help              Help for login
+  -p, --password string   password
+      --password-stdin    Take the password from stdin
+  -u, --username string   username
+
+Use "docker login [command] --help" for more information about a command.
+```
+Usually, use stdin (keyboard):
+```
+$docker login
+
+ask, username and password bay stdin, keyboard...
+
+```
+
+>0045_Docker_push
+
+>0046_Docker_Inspect
+
+Debug Docker, **inspect**:
+```
+$docker inspect --help
+
+Usage:  docker inspect [OPTIONS] NAME|ID [NAME|ID...]
+
+Return low-level information on Docker objects
+
+Options:
+  -f, --format string   Format output using a custom template:
+                        'json':             Print in JSON format
+                        'TEMPLATE':         Print output using the given Go template.
+                        Refer to https://docs.docker.com/go/formatting/ for more
+                        information about formatting output with templates
+  -s, --size            Display total file sizes if the type is container
+      --type string     Return JSON for specified type
+
+```
+```
+$docker ps -a --format=$FORMAT
+ID	5f9d4d16ae19
+NAME	dashboard
+IMAGE	dashboard
+PORTS	0.0.0.0:8080->80/tcp
+COMMAND	"/docker-entrypoint.…"
+CREATED	2024-05-16 20:01:07 +0200 CEST
+STATUS	Exited (255) 6 hours ago
+
+$ docker inspect dashboard     
+[
+    {
+        "Id": "5f9d4d16ae19da13aa2d1de201285a848fc28dcaf8d21349d5dfd258441bfe7a",
+        "Created": "2024-05-16T18:01:07.595853927Z",
+        "Path": "/docker-entrypoint.sh",
+        "Args": [
+            "nginx",
+            "-g",
+            "daemon off;"
+        ],
+        "State": {
+            "Status": "exited
+
+
+...
+
+```
+
+
+>0047_Logs
+
+
+```
+$docker logs --help           
+
+Usage:  docker logs [OPTIONS] CONTAINER
+
+Fetch the logs of a container
+
+Aliases:
+  docker container logs, docker logs
+
+Options:
+      --details        Show extra details provided to logs
+  -f, --follow         Follow log output
+      --since string   Show logs since timestamp (e.g. "2013-01-02T13:23:37Z") or relative
+                       (e.g. "42m" for 42 minutes)
+  -n, --tail string    Number of lines to show from the end of the logs (default "all")
+  -t, --timestamps     Show timestamps
+      --until string   Show logs before a timestamp (e.g. "2013-01-02T13:23:37Z") or
+                       relative (e.g. "42m" for 42 minutes)
+
+```
+use flag -f to see on live the log of the docker:
+```
+$docker logs dashboard -f
+```
+
+>0048_Running_commands_in_Containers
+
+**Run a command in a running container**:
+```
+$docker exec --help          
+
+Usage:  docker exec [OPTIONS] CONTAINER COMMAND [ARG...]
+
+Execute a command in a running container
+
+Aliases:
+  docker container exec, docker exec
+
+Options:
+  -d, --detach               Detached mode: run command in the background
+      --detach-keys string   Override the key sequence for detaching a container
+  -e, --env list             Set environment variables
+      --env-file list        Read in a file of environment variables
+  -i, --interactive          Keep STDIN open even if not attached
+      --privileged           Give extended privileges to the command
+  -t, --tty                  Allocate a pseudo-TTY
+  -u, --user string          Username or UID (format: "<name|uid>[:<group|gid>]")
+  -w, --workdir string       Working directory inside the container
+
+```
+How to look **Environment variables** of an Image, run dashboardpepe:
+```
+docker run --name dashboardpepe -d -p 8080:80 dashboard
+```
+Now lets see images:
+```
+$docker ps -a --format=$FORMAT                          
+ID	8fb6fec21040
+NAME	dashboardpepe
+IMAGE	dashboard
+PORTS	0.0.0.0:8080->80/tcp
+COMMAND	"/docker-entrypoint.…"
+CREATED	2024-05-23 19:37:20 +0200 CEST
+STATUS	Up 7 seconds
+
+ID	5f9d4d16ae19
+NAME	dashboard
+IMAGE	dashboard
+PORTS	0.0.0.0:8080->80/tcp
+COMMAND	"/docker-entrypoint.…"
+CREATED	2024-05-16 20:01:07 +0200 CEST
+STATUS	Exited (255) 6 hours ago
+
+
+```
+lets se enviromental variables,**env**:
+```
+$docker exec dashboardpepe env 
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+HOSTNAME=8fb6fec21040
+NGINX_VERSION=1.25.5
+NJS_VERSION=0.8.4
+NJS_RELEASE=3~bookworm
+PKG_RELEASE=1~bookworm
+HOME=/root
+
+```
+now directories, **env**:
+```
+docker exec dashboardpepe ls 
+bin
+boot
+dev
+docker-entrypoint.d
+docker-entrypoint.sh
+etc
+home
+lib
+lib64
+media
+mnt
+opt
+proc
+root
+run
+sbin
+srv
+sys
+tmp
+usr
+var
+
+```
+run shell inside container using **flag -it**(pwd, ls, cd/, ls, top, df, ctrl+d(to exit)):
+```
+docker exec -it dashboardpepe sh
+# pwd
+/
+# ls
+bin   dev		   docker-entrypoint.sh  home  lib64  mnt  proc  run   srv  tmp  var
+boot  docker-entrypoint.d  etc			 lib   media  opt  root  sbin  sys  usr
+# cd /
+# ls
+bin   dev		   docker-entrypoint.sh  home  lib64  mnt  proc  run   srv  tmp  var
+boot  docker-entrypoint.d  etc			 lib   media  opt  root  sbin  sys  usr
+# top
+sh: 5: top: not found
+# df
+Filesystem     1K-blocks    Used Available Use% Mounted on
+overlay         65739308 2251812  60115720   4% /
+tmpfs              65536       0     65536   0% /dev
+shm                65536       0     65536   0% /dev/shm
+/dev/vda1       65739308 2251812  60115720   4% /etc/hosts
+tmpfs             842096       0    842096   0% /proc/acpi
+tmpfs             842096       0    842096   0% /sys/firmware
+# 
+
+
+What's next?
+  Try Docker Debug for seamless, persistent debugging tools in any container or image → docker debug dashboardpepe
+  Learn more at https://docs.docker.com/go/debug-cli/
+
+
+```
+
+**ctrl+d** to exit shell inside container!!!
