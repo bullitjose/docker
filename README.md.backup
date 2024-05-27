@@ -1157,3 +1157,134 @@ What's next?
 ```
 
 **ctrl+d** to exit shell inside container!!!
+
+>0049_How_to_comunicate_between_containers
+
+![](0049_How_to_comunicate_between_containers.png)
+
+>0050_Docker_Network
+
+```
+$docker network --help           
+
+Usage:  docker network COMMAND
+
+Manage networks
+
+Commands:
+  connect     Connect a container to a network
+  create      Create a network
+  disconnect  Disconnect a container from a network
+  inspect     Display detailed information on one or more networks
+  ls          List networks
+  prune       Remove all unused networks
+  rm          Remove one or more networks
+
+Run 'docker network COMMAND --help' for more information on a command.
+
+
+```
+lets create a network for Mongo Express and mongoDB:
+```
+$docker network create mongo
+64779d4cd085b69fedef9a1ab0d48a8ad9b8f9ceee3d9ea54555e103753fb665
+
+$docker network ls          
+NETWORK ID     NAME      DRIVER    SCOPE
+47ed46efc7a0   bridge    bridge    local
+e2cda59dc980   host      host      local
+64779d4cd085   mongo     bridge    local
+6877c865401e   none      null      local
+
+```
+we can inspect the network created:
+```
+$docker network inspect mongo
+[
+    {
+        "Name": "mongo",
+        "Id": "64779d4cd085b69fedef9a1ab0d48a8ad9b8f9ceee3d9ea54555e103753fb665",
+        "Created": "2024-05-27T14:18:31.606529152Z",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": {},
+            "Config": [
+                {
+                    "Subnet": "172.18.0.0/16",
+                    "Gateway": "172.18.0.1"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Containers": {},
+        "Options": {},
+        "Labels": {}
+    }
+]
+
+```
+![](0050_Docker_Network.png)
+
+>0051_MongoDB_Container
+
+1st, pull mongoDB Image called mongo, and run at port 27017 and network mongo, version of mongo mongo:8.0.0-rc4-jammy:
+```
+$ docker run --name mongo  -d --network mongo -p 27017:27017 \
+	-e MONGO_INITDB_ROOT_USERNAME=pepe \
+	-e MONGO_INITDB_ROOT_PASSWORD=passwordpepe+EÑE mongo:8.0.0-rc4-jammy
+```
+
+look at:
+![](0051_MongoDB_Container_Environmental_Variable.png)
+
+look mongo logs:
+```
+docker logs mongo
+....
+```
+
+**its waiting for connections**, lets **install MongoExpress**
+
+>0052_MongoExpress
+
+Look mongo-express at dockerhub:
+
+![](0052_MongoExpressle.png)
+
+![](0052_MongoExpress_1.png)
+
+we pull version **mongo-express:1.0.2-18-alpine3.19**:
+![](0052_MongoExpress_version.png)
+
+lets run image, name mongo-express, network mongo, port 8081, and environmental variable for username(same as mogodb), password(same as mongodb)and mongodb_server mongo and its image name, mongo-express:
+```
+docker run --name mongo-express --network mongo -d -p 8081:8081 \
+-e ME_CONFIG_MONGODB_ADMINUSERNAME=pepe \
+-e ME_CONFIG_MONGODB_ADMINPASSWORD=passwordpepe+EÑE \
+-e ME_CONFIG_MONGODB_SERVER=mongo mongo-express \
+-e ME_CONFIG_BASICAUTH_USERNAME=admin \
+-e ME_CONFIG_BASICAUTH_PASSWORD=123 \
+```
+now lets see if mongo-express:
+```
+docker logs mongo-express                                        
+Waiting for mongo:27017...
+No custom config.js found, loading config.default.js
+Welcome to mongo-express 1.0.2
+------------------------
+
+
+Mongo Express server listening at http://0.0.0.0:8081
+Server is open to allow connections from anyone (0.0.0.0)
+basicAuth credentials are "admin:pass", it is recommended you change this in your config.js!
+```
+now go to browser and type localhos:8081 (**Mongo Express server listening at http://0.0.0.0:8081**)
