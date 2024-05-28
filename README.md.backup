@@ -1288,3 +1288,235 @@ Server is open to allow connections from anyone (0.0.0.0)
 basicAuth credentials are "admin:pass", it is recommended you change this in your config.js!
 ```
 now go to browser and type localhos:8081 (**Mongo Express server listening at http://0.0.0.0:8081**)
+
+>0053_Understanding_Container_Communication
+
+![](0053_Understanding_Container_Communication.png)
+
+>0054_Another_example
+
+>0055_What_is_Docker_Compose
+
+Before, we use 3 commands to create and run 2 containers and create a network to connect them:
+![](0055_What_is_Docker_Compose_1.png)
+
+now we usea **Docker Compose**, is a tool for defining and running multi-container Docker apps using a **yaml file**
+
+>0056_Docker_Compose_cmd
+
+We have **$docker-compose**, and if we install compose V2 we will have **$docker compose**
+
+>0057_Services
+
+lets create a file yml:
+```/AAA/IT/amigos_code  mkdir docker-compose
+$/AAA/IT/amigos_code $ cd docker-compose    
+$ touch docker-compose.yml
+$ ls
+docker-compose.yml
+
+```
+
+at docker-compose.yml:
+```
+services:
+  mongo:
+    image: mongo:8.0.0-rc4-jammy
+    container_name: mongo
+    ports:
+      -27017:27017
+    environment:
+      -MONGO_INITDB_ROOT_USERNAME=amigoscode
+      -MONGO_INITDB_ROOT_PASSWORD=password
+  mongo-express:
+    image: mongo-express
+    container_name: mongo-express
+    ports:
+      -8081:8081
+    environment:
+      -ME_CONFIG_MONGODB_ADMINUSERNAME=amigoscode
+      -ME_CONFIG_MONGODB_ADMINPASSWORD=password
+    depends_on:
+      - mongo
+    restart: always
+
+```
+
+>0058_Docker_Network
+
+add network at docker-compose.yml:
+```
+services:
+  mongo:
+    image: mongo:8.0.0-rc4-jammy
+    container_name: mongo
+    ports:
+      - 27017:27017
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=amigoscode
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    networks:
+      - mongo
+  mongo-express:
+    image: mongo-express
+    container_name: mongo-express
+    ports:
+      - 8081:8081
+    environment:
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=amigoscode
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=password
+      - ME_CONFIG_MONGODB_SERVER=mongo
+      - ME_CONFIG_BASICAUTH_USERNAME=sa
+      - ME_CONFIG_BASICAUTH_PASSWORD=sa
+    depends_on:
+      - mongo
+    restart: always
+    networks:
+      - mongo
+networks:
+  mongo:
+    name: mongo
+ 
+
+```
+
+>0059_Docker_Compose_Up
+
+remove network mongo:
+```
+ docker network rm mongo      
+mongo
+```
+
+now use docker-compose.yml:
+```
+$ll
+total 0
+-rw-rw-r-- 1 pepe pepe 0 de maig  28 11:58 docker-compose.yml
+$docker compose --      
+
+Usage:  docker compose [OPTIONS] COMMAND
+
+Define and run multi-container applications with Docker
+
+Options:
+      --all-resources              Include all resources, even those not used by services
+      --ansi string                Control when to print ANSI control characters ("never"|"alw
+---
+```
+we use **docker compose up**:
+```
+$docker compose up
+
+```
+if we use -d, it runs at background:
+```
+$docker compose up -d   
+[+] Running 3/3
+ ✔ Network mongo            Created                                                                                              0.0s 
+ ✔ Container mongo          Started                                                                                              0.3s 
+ ✔ Container mongo-express  Started  
+ ```                                
+see the neetwork:
+```
+docker network ls      
+NETWORK ID     NAME      DRIVER    SCOPE
+9225a6c7b1b5   bridge    bridge    local
+b6822eadd621   host      host      local
+e8c5bf599232   mongo     bridge    local
+0135d3a72172   none      null      local
+
+```
+
+and the containers:
+
+```
+docker ps -a --format=$FORMAT
+ID	cbce180a1db9
+NAME	mongo-express
+IMAGE	mongo-express
+PORTS	0.0.0.0:8081->8081/tcp
+COMMAND	"/sbin/tini -- /dock…"
+CREATED	2024-05-28 12:32:18 +0200 CEST
+STATUS	Up 2 minutes
+
+ID	dfd4e2fdd881
+NAME	mongo
+IMAGE	mongo:8.0.0-rc4-jammy
+PORTS	0.0.0.0:27017->27017/tcp
+COMMAND	"docker-entrypoint.s…"
+CREATED	2024-05-28 12:32:18 +0200 CEST
+STATUS	Up 2 minutes
+```
+
+>0060_Exploring_docker_compose_commands
+
+lets see containers running:
+```
+docker compose ps   
+NAME            IMAGE                   COMMAND                  SERVICE         CREATED         STATUS         PORTS
+mongo           mongo:8.0.0-rc4-jammy   "docker-entrypoint.s…"   mongo           4 minutes ago   Up 4 minutes   0.0.0.0:27017->27017/tcp
+mongo-express   mongo-express           "/sbin/tini -- /dock…"   mongo-express   4 minutes ago   Up 4 minutes   0.0.0.0:8081->8081/tcp
+
+```
+lets see docker compose ls, list running compose projects:
+```
+docker compose ls
+NAME                STATUS              CONFIG FILES
+docker-compose      running(2)          /home/pepe/AAA/IT/amigos_code/docker/docker-compose/docker-compose.yml
+
+```
+lets see docker compose **stop, start and down**:
+```
+$docker compose stop  
+[+] Stopping 2/2
+ ✔ Container mongo-express  Stopped                                                                                                            0.1s 
+ ✔ Container mongo          Stopped                                                                                                            0.2s 
+$docker compose start
+[+] Running 2/2
+ ✔ Container mongo          Started                                                                                                            0.2s 
+ ✔ Container mongo-express  Started                                                                                                            0.2s 
+$ docker compose down 
+[+] Running 3/3
+ ✔ Container mongo-express  Removed                                                                                                            0.2s 
+ ✔ Container mongo          Removed                                                                                                            0.2s 
+ ✔ Network mongo            Removed                                                              
+
+```
+lets see if network and containers are removed:
+```
+$docker network ls                               
+NETWORK ID     NAME      DRIVER    SCOPE
+9225a6c7b1b5   bridge    bridge    local
+b6822eadd621   host      host      local
+0135d3a72172   none      null      local
+
+$docker ps -a --format=$FORMAT
+Sdocker ps                    
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+
+```
+to run all again, use **docker compose up -d**:
+
+```
+$docker compose up -d
+[+] Running 3/3
+ ✔ Network mongo            Created                                                                                                            0.0s 
+ ✔ Container mongo          Started                                                                                                            0.2s 
+ ✔ Container mongo-express  Started                                                        
+
+```
+
+We use flag -d , to detached mongo and mongo-express it run second plane, if we need see logs of mongo, **view output from containers**:
+
+```
+$docker compose logs mongo -f
+```
+
+
+
+ 
+
+
+
+
