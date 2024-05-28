@@ -1239,8 +1239,8 @@ $docker network inspect mongo
 1st, pull mongoDB Image called mongo, and run at port 27017 and network mongo, version of mongo mongo:8.0.0-rc4-jammy:
 ```
 $ docker run --name mongo  -d --network mongo -p 27017:27017 \
-	-e MONGO_INITDB_ROOT_USERNAME=pepe \
-	-e MONGO_INITDB_ROOT_PASSWORD=passwordpepe+EÑE mongo:8.0.0-rc4-jammy
+	-e MONGO_INITDB_ROOT_USERNAME=rootuser \
+	-e MONGO_INITDB_ROOT_PASSWORD=rootpass mongo:8.0.0-rc4-jammy
 ```
 
 look at:
@@ -1268,11 +1268,11 @@ we pull version **mongo-express:1.0.2-18-alpine3.19**:
 lets run image, name mongo-express, network mongo, port 8081, and environmental variable for username(same as mogodb), password(same as mongodb)and mongodb_server mongo and its image name, mongo-express:
 ```
 docker run --name mongo-express --network mongo -d -p 8081:8081 \
--e ME_CONFIG_MONGODB_ADMINUSERNAME=pepe \
--e ME_CONFIG_MONGODB_ADMINPASSWORD=passwordpepe+EÑE \
+-e ME_CONFIG_MONGODB_ADMINUSERNAME=rootuser \
+-e ME_CONFIG_MONGODB_ADMINPASSWORD=rootpass \
 -e ME_CONFIG_MONGODB_SERVER=mongo mongo-express \
--e ME_CONFIG_BASICAUTH_USERNAME=admin \
--e ME_CONFIG_BASICAUTH_PASSWORD=123 \
+-e ME_CONFIG_BASICAUTH_USERNAME=sa \
+-e ME_CONFIG_BASICAUTH_PASSWORD=sa \
 ```
 now lets see if mongo-express:
 ```
