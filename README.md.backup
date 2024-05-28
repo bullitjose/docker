@@ -3,23 +3,28 @@ Docker and Kubernetes - Full Course for Beginners AmigosCode
 remove origin!!
 
 
-add our new origin, to our github
-
+add our new origin, to our github:
+```
 git remote add origin git@github.com:bullitjose/docker
+```
 
-add changes at local to origin, at github
+
+add changes at local to origin, at github:
+
 ```
 git push -u origin master
 ```
 
-download changes at github to local
+download changes at github to local:
+
 ```
 git pull origin master
 
 git and github
 ```
 
-    …or create a new repository on the command line
+   …or create a new repository on the command line:
+
 ```
 echo "# testing" >> README.md
 git init
@@ -30,12 +35,29 @@ git remote add origin https://github.com/bullitjose/testing.git
 git push -u origin main
 ```
 
-    …or push an existing repository from the command line
+    …or push an existing repository from the command line:
+
 ```
 git remote add origin https://github.com/bullitjose/testing.git
 git branch -M main
 git push -u origin main
 ```
+
+>Install Docker Desktop
+
+Recommended approach to install Docker Desktop on Ubuntu:
+   1.Set up Docker's package repository. See step one of Install using the apt repository.
+
+   2.Download latest DEB package: [install using the repository](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository)
+
+   3.Install the package with apt as follows:
+   
+```
+ sudo apt-get update
+
+ sudo apt-get install ./docker-desktop-<version>-<arch>.deb
+ ```
+ 
 
 >Launch Docker Desktop
 
@@ -44,7 +66,7 @@ To start Docker Desktop for Linux, search Docker Desktop on the Applications men
 Alternatively, open a terminal and run:
 ```
  systemctl --user start docker-desktop
- ```
+```
  
  After you’ve successfully installed Docker Desktop, you can check the versions of these binaries by running the following commands:
 ```
@@ -62,7 +84,7 @@ Client: Docker Engine - Community
 <...>
 ```
 
-> I opened the terminal to run and igot this error:
+> I opened the terminal to run and i got this error:
 
 ```
 systemctl --user start docker-desktop
@@ -203,4 +225,1298 @@ $ docker run --name some-wordpress --network some-network -d wordpress
 If you'd like to be able to access the instance from the host without the container's IP, standard port mappings can be used:
 ```
 $ docker run --name some-wordpress -p 8080:80 -d wordpress
+Unable to find image 'wordpress:latest' locally
+latest: Pulling from library/wordpress
+b0a0cf830b12: Pull complete 
+c93478d47932: Pull complete 
+e74cc574d0d2: Pull complete 
+e4782e138a90: Pull complete 
+cfeec87621ae: Pull complete 
+c1badcd002c0: Pull complete 
+e0d463a60cb6: Pull complete 
+8bce13a727be: Pull complete 
+8cbeca1cab87: Pull complete 
+9216544a8100: Pull complete 
+2b3680ee4acb: Pull complete 
+35fa048d3ad4: Pull complete 
+e8be4124e519: Pull complete 
+7f1beb739060: Pull complete 
+fa118a71e862: Pull complete 
+2769eb42fecf: Pull complete 
+0e93a2a8bf0f: Pull complete 
+638e00bd0917: Pull complete 
+513bffc3d60d: Pull complete 
+ea7798d3fbb1: Pull complete 
+f2eb955eba32: Pull complete 
+Digest: sha256:9ce0773fc5be134b2a2268ccc9e1da8cf9b17a0462259a38a2c85e604c9c02cd
+Status: Downloaded newer image for wordpress:latest
+e70c38d95942eb39ebc4307268bc48732c9b7befc426bf72dcd51d4dd8c5ec34
+
 ```
+ Search at internet:
+ ```
+ http://localhost:8080
+ ```
+ we run wordpress on our machine.
+ 
+ 
+ > running container, docker ps:
+ ```
+  $docker ps -a                  
+  ```
+                            
+|CONTAINER ID|   IMAGE       |COMMAND                  |CREATED         |STATUS         |PORTS                  |NAMES|
+|----|---|---|---|---|---|---|
+|e70c38d95942   |wordpress   |"docker-entrypoint.s…"   |9 minutes ago   |Up 9 minutes   |0.0.0.0:8080->80/tcp   |some-wordpress|
+
+
+>stop contanier, docker stop:
+
+```
+$docker stop e70c38d95942
+e70c38d95942
+$docker ps -a            
+CONTAINER ID   IMAGE       COMMAND                  CREATED          STATUS                     PORTS     NAMES
+e70c38d95942   wordpress   "docker-entrypoint.s…"   10 minutes ago   Exited (0) 2 seconds ago             some-wordpress
+
+```
+
+>remove container, docker rm:
+
+```
+$docker rm e70c38d95942  
+e70c38d95942
+$docker ps -a           
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+```
+>remove container without stopp it, docker rm -f:
+
+```
+$docker rm 00d353764328             
+Error response from daemon: cannot remove container "/some-wordpress": container is running: stop the container before removing or force remove
+$docker rm -f 00d353764328
+00d353764328
+$docker ps -a             
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+```
+
+>0011 Docker ps format
+use a Go template Pretty-print containers:
+
+```
+docker ps --help
+
+Usage:  docker ps [OPTIONS]
+
+List containers
+
+Aliases:
+  docker container ls, docker container list, docker container ps, docker ps
+
+Options:
+  -a, --all             Show all containers (default shows just running)
+  -f, --filter filter   Filter output based on conditions provided
+      --format string   Format output using a custom template:
+                        'table':            Print output in table format with column headers (default)
+                        'table TEMPLATE':   Print output in table format using the given Go template
+                        'json':             Print in JSON format
+                        'TEMPLATE':         Print output using the given Go template.
+                        Refer to https://docs.docker.com/go/formatting/ for more information about formatting output with templates
+  -n, --last int        Show n last created containers (includes all states) (default -1)
+  -l, --latest          Show the latest created container (includes all states)
+      --no-trunc        Don't truncate output
+  -q, --quiet           Only display container IDs
+  -s, --size            Display total file sizes
+```
+
+To get the nicely formatted docker, here is the string:
+```
+$export FORMAT="ID\t{{.ID}}\nNAME\t{{.Names}}\nIMAGE\t{{.Image}}\nPORTS\t{{.Ports}}\nCOMMAND\t{{.Command}}\nCREATED\t{{.CreatedAt}}\nSTATUS\t{{.Status}}\n" 
+```
+Now we use this format:
+```
+$ docker ps --format=$FORMAT
+ID	6dbfbdf677a9
+NAME	some-wordpress
+IMAGE	wordpress
+PORTS	0.0.0.0:8080->80/tcp
+COMMAND	"docker-entrypoint.s…"
+CREATED	2024-05-14 12:53:57 +0200 CEST
+STATUS	Up About a minute
+```
+
+>0012_Exposing Ports
+
+At the container we have a app listening on port 80, https:ip-address:80, the first port is the host and second the container, -p 80:80:
+```
+$docker run -p 8081:80 -d wordpress
+Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?.
+```
+**Starts Docker Desktop app's!!**
+```
+ID	5af3b6de6355
+NAME	some-wordpress
+IMAGE	wordpress
+PORTS	0.0.0.0:8080->80/tcp
+COMMAND	"docker-entrypoint.s…"
+CREATED	2024-05-14 17:21:19 +0200 CEST
+STATUS	Up 7 minutes
+```
+**At ports we have: PORTS	0.0.0.0:8080->80/tcp , the host is 0.0.0.0:8080, and ->80 the port of the container**
+
+>0013_Expoxing Multiple Ports
+
+```
+$docker run -p 80:80 -p 5000:80 -p 3000:80 -d amigoscode/2048
+
+$docker ps --format=$FORMAT                                  
+ID	4da8b69e013d
+NAME	festive_agnesi
+IMAGE	amigoscode/2048
+PORTS	0.0.0.0:80->80/tcp, 0.0.0.0:3000->80/tcp, 0.0.0.0:5000->80/tcp
+COMMAND	"/docker-entrypoint.…"
+CREATED	2024-05-14 17:41:13 +0200 CEST
+STATUS	Up 11 seconds
+
+ID	5af3b6de6355
+NAME	some-wordpress
+IMAGE	wordpress
+PORTS	0.0.0.0:8080->80/tcp
+COMMAND	"docker-entrypoint.s…"
+CREATED	2024-05-14 17:21:19 +0200 CEST
+STATUS	Up 20 minutes
+
+```
+
+if we open a browser, we find image of amigoscode at ports 8080 and 3000:
+**(http://localhost:3000/ ) or (http://localhost:80/)**
+
+>0014_Naming Containers
+
+First stop and remove container:
+
+```
+$docker rm -f 4da8b69e013d                
+4da8b69e013d
+```
+Now run container with a name!!
+```
+docker run --name 2048 -p 80:80 -p 8081:80 -d amigoscode/2048
+```
+Lets see containers running:
+```
+$docker ps --format=$FORMAT                                   
+ID	0269529f131c
+NAME	2048
+IMAGE	amigoscode/2048
+PORTS	0.0.0.0:80->80/tcp, 0.0.0.0:8081->80/tcp
+COMMAND	"/docker-entrypoint.…"
+CREATED	2024-05-14 18:08:50 +0200 CEST
+STATUS	Up About a minute
+
+ID	5af3b6de6355
+NAME	some-wordpress
+IMAGE	wordpress
+PORTS	0.0.0.0:8080->80/tcp
+COMMAND	"docker-entrypoint.s…"
+CREATED	2024-05-14 17:21:19 +0200 CEST
+STATUS	Up 48 minutes
+```
+
+>0015_Running Container in the background
+
+let's use the flag -d with run:
+```
+$docker run --help 
+....
+-d, --detach                           Run container in background and
+                                         print container ID
+...
+```
+**run on background mode, for example:**
+```
+$docker run --name website d -p 8080:80 nginx
+
+```
+
+>0016_Docker Images
+
+>0017_Managing Docker Images
+list images, docker image ls:
+
+```
+$docker image ls    
+REPOSITORY        TAG       IMAGE ID       CREATED       SIZE
+wordpress         latest    5fb7d355caa4   6 days ago    685MB
+amigoscode/2048   latest    82f9808f239f   2 years ago   135MB
+```
+remove a Image, first remove the container:
+```
+$ docker rm -f 2048 
+```
+then we can remove Image:
+```
+$docker image rm 2048 
+```
+image 2048 will not find locally, we must pull it again
+
+**$docker rmi 2048** is the same as **$docker image rm 2048**
+
+>0018_Docker Pull
+
+Pull image without run it.
+```
+$docker pull nginx
+```
+
+>0019_Inspecting Images
+
+```
+$ docker image inspect wordpress
+
+```
+
+>0020_Docker Architecture
+
+![](0020_Docker_Architecture.png)
+
+>0021_Docker Daemon
+
+![](0021_Docker_ Daemon.png)
+
+Where is Docker Daemon:
+```
+$ cd ~/.docker
+.docker$ls    
+buildx       contexts     desktop        features.json  scan
+config.json  daemon.json  desktop-build  mutagen
+```
+here we find **daemon.json**
+```
+cat daemon.json 
+{
+  "builder": {
+    "gc": {
+      "defaultKeepStorage": "20GB",
+      "enabled": true
+    }
+  },
+  "experimental": false
+}
+```
+that's the same as we found at app **Docker Desktop** Docker Engine:
+
+![](0021_Docker_ Daemon_Docker_Engine.png)
+
+Here we can **configure Docker Daemon**
+
+If we quit from app **Docker Desktop** then:
+```
+docker ps                     
+Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?
+```
+**docker.sock is the daemon**
+
+>0022_Volumes
+
+![](0022_Volumes_1.png)
+```
+$docker run bash bash -c "echo foo > bar.txt && cat bar.txt"
+Unable to find image 'bash:latest' locally
+latest: Pulling from library/bash
+4abcf2066143: Pull complete 
+104abb8d8f68: Pull complete 
+58723bf50cb1: Pull complete 
+Digest: sha256:890897682a8025c1e178b5ec6126b3b532ad8535f1e81dbf60bc2b7300b1bcf8
+Status: Downloaded newer image for bash:latest
+foo
+```
+now we can see the new container:
+```
+docker ps -a --format=$FORMAT
+ID	e748dcaa78a1
+NAME	mystifying_poitras
+IMAGE	bash
+PORTS	
+COMMAND	"docker-entrypoint.s…"
+CREATED	2024-05-15 19:05:02 +0200 CEST
+STATUS	Exited (0) 3 minutes ago
+
+ID	0269529f131c
+NAME	2048
+IMAGE	amigoscode/2048
+PORTS	0.0.0.0:80->80/tcp, 0.0.0.0:8081->80/tcp
+COMMAND	"/docker-entrypoint.…"
+CREATED	2024-05-14 18:08:50 +0200 CEST
+STATUS	Exited (255) About an hour ago
+
+ID	5af3b6de6355
+NAME	some-wordpress
+IMAGE	wordpress
+PORTS	0.0.0.0:8080->80/tcp
+COMMAND	"docker-entrypoint.s…"
+CREATED	2024-05-14 17:21:19 +0200 CEST
+STATUS	Exited (255) About an hour ago
+
+```
+IMAGE bash, is where is the **volume** with the bar.txt.
+
+>0023_Bind_Mount_Volumes
+
+![](0023_Bind_Mount_Volumes_1.png)
+
+>0024_Bind_Mount_Volumes_in Action
+
+After $docker run bash bash -c "echo foo > bar.txt && cat bar.txt", 
+```
+$docker run --help 
+
+Usage:  docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
+
+Create and run a new container from an image
+
+....
+
+-v, --volume list                      Bind mount a volume
+      --volume-driver string             Optional volume driver for the container
+      --volumes-from list                Mount volumes from the specified container(s)
+      
+      ...
+```
+we can share data between host and the container with the flag -v, $PWD is pwd of the host, is a path where is the volume:
+```
+$docker run -v $PWD:/tmp bash bash -c "echo foo > /tmp/bar.txt && cat /tmp/bar.txt"
+```
+
+>0025_Using Volumes for Local Dev
+
+download https://startbootstrap.com/theme/sb-admin-2, unzip and rename as dashboard,then inside dashboard:
+```
+dashboard $ docker run --name dashboard -d -p 8080:80 nginx
+Unable to find image 'nginx:latest' locally
+latest: Pulling from library/nginx
+09f376ebb190: Pull complete 
+a11fc495bafd: Pull complete 
+933cc8470577: Pull complete 
+999643392fb7: Pull complete 
+971bb7f4fb12: Pull complete 
+45337c09cd57: Pull complete 
+de3b062c0af7: Pull complete 
+Digest: sha256:a484819eb60211f5299034ac80f6a681b06f89e65866ce91f356ed7c72af059c
+Status: Downloaded newer image for nginx:latest
+0423c95672aa8404c757c3ec19818157e98431ed04e2a23a819d9b043d2539a7
+
+```
+then go to the browser, and type: localhost:8080
+
+![](0025_Using Volumes for local dev_1.png)
+
+lets remove this image:
+```
+dashboard $docker rm -f dashboard   
+dashboard
+
+```
+lets do ls:
+```
+dashboard $ ls
+404.html              index.html         scss
+blank.html            js                 tables.html
+buttons.html          LICENSE            utilities-animation.html
+cards.html            login.html         utilities-border.html
+charts.html           package.json       utilities-color.html
+css                   package-lock.json  utilities-other.html
+forgot-password.html  PRO_UPGRADE.txt    vendor
+gulpfile.js           README.md
+img                   register.html
+
+```
+there is a lot of files, now inside dashboard, run nginx:
+```
+ ~/Baixades/docker/dashboard $docker run --name dashboard \
+-v "$PWD:/usr/share/nginx/html" -d -p 8080:80 nginx
+50d92db56098ff9d80e21dda6c15dbb653a6a495c2cdc7861fe1d2102d9787c5
+```
+lets see ps:
+```
+Baixades/docker/dashboard $docker ps -a --format=$FORMAT
+ID	50d92db56098
+NAME	dashboard
+IMAGE	nginx
+PORTS	0.0.0.0:8080->80/tcp
+COMMAND	"/docker-entrypoint.…"
+CREATED	2024-05-16 12:28:11 +0200 CEST
+STATUS	Up 2 seconds
+
+```
+lets see the browser how its nginx now:
+
+![](0025_Using Volumes for local dev_2.png)
+
+now  the nginx has the a **free Bootstrap 2 admin theme** built with HTML/CSS
+
+>0026_Docker_Volumes
+
+![Different Types of Volumes](0026_Docker Volumes(Different Types of Volumes).png)
+
+lets see docker volume:
+```
+ ~/Baixades/docker/dashboard $ docker volume --help         
+
+Usage:  docker volume COMMAND
+
+Manage volumes
+
+Commands:
+  create      Create a volume
+  inspect     Display detailed information on one or more volumes
+  ls          List volumes
+  prune       Remove unused local volumes
+  rm          Remove one or more volumes
+
+Run 'docker volume COMMAND --help' for more information on a command.
+
+```
+
+lets create a volume, vol1:
+```
+ ~/Baixades/docker/dashboard $docker volume create vol1
+vol1
+~/Baixades/docker/dashboard $docker volume inspect vol1          
+[
+    {
+        "CreatedAt": "2024-05-16T10:52:23Z",
+        "Driver": "local",
+        "Labels": null,
+        "Mountpoint": "/var/lib/docker/volumes/vol1/_data",
+        "Name": "vol1",
+        "Options": null,
+        "Scope": "local"
+    }
+]
+
+```
+lets see volumes:
+```
+ ~/Baixades/docker/dashboard $ docker volume ls          
+DRIVER    VOLUME NAME
+local     15da86192c89af644d0d419f26f9812cfe52ceb836ae2db4334e9e9525b38fb5
+local     vol1
+
+```
+lets delete vol1:
+```
+ ~/Baixades/docker/dashboard $ docker volume rm vol1 
+vol1
+```
+
+>0027_tmpfs_Mount
+
+![](0027_tmpfs_Mount(Different Types of Volumes).png)
+
+>0028_Dockerfile
+
+![](0028_Docker_File_1.png)
+
+![](0028_Docker_File_2.png)
+
+>0029_Creating_Dockerfile
+
+create a Dockerfile called "Dockerfile", inside dashboard directory:
+![](0029_Creating_Docker_File.png)
+
+>0030_Building_DockerImages
+
+now Build DockerImages inside dashboard:
+```
+ ~/Baixades/docker/dashboard $ ls
+404.html      forgot-password.html  package.json       utilities-animation.html
+blank.html    gulpfile.js           package-lock.json  utilities-border.html
+buttons.html  img                   PRO_UPGRADE.txt    utilities-color.html
+cards.html    index.html            README.md          utilities-other.html
+charts.html   js                    register.html      vendor
+css           LICENSE               scss
+Dockerfile    login.html            tables.html
+
+```
+there is the Dockerfile we created at 0029, if we have a look:
+```
+ ~/Baixades/docker/dashboard $ cat Dockerfile 
+FROM nginx
+COPY . /usr/share/nginx/html%  
+```
+now, list the images we have:
+```
+docker image ls
+REPOSITORY        TAG       IMAGE ID       CREATED        SIZE
+wordpress         latest    5fb7d355caa4   8 days ago     685MB
+nginx             latest    e784f4560448   12 days ago    188MB
+bash              latest    9eb4e69a801b   4 months ago   14MB
+amigoscode/2048   latest    82f9808f239f   2 years ago    135MB
+
+```
+now lets build docker on dashboard directory, so we use **.** as file path:
+```
+~/Baixades/docker/dashboard $ docker build . -t dashboard
+[+] Building 2.8s (7/7) FINISHED                                  docker:desktop-linux
+ => [internal] load build definition from Dockerfile                              0.1s
+ => => transferring dockerfile: 76B                                               0.0s
+ => [internal] load metadata for docker.io/library/nginx:latest                   0.0s
+ => [internal] load .dockerignore                                                 0.0s
+ => => transferring context: 2B                                                   0.0s
+ => [internal] load build context                                                 1.3s
+ => => transferring context: 18.31MB                                              1.2s
+ => [1/2] FROM docker.io/library/nginx:latest                                     0.5s
+ => [2/2] COPY . /usr/share/nginx/html                                            0.7s
+ => exporting to image                                                            0.5s
+ => => exporting layers                                                           0.4s
+ => => writing image sha256:8147c96d599609b406a821cc8a5887e1cd7a6274d0830ff100c8  0.0s
+ => => naming to docker.io/library/dashboard                                      0.0s
+
+What's Next?
+  1. Sign in to your Docker account → docker login
+  2. View a summary of image vulnerabilities and recommendations → docker scout quickview
+
+```
+lets see docker images:
+```
+ ~/Baixades/docker/dashboard $ docker image ls            
+REPOSITORY        TAG       IMAGE ID       CREATED         SIZE
+dashboard         latest    8147c96d5996   3 minutes ago   206MB
+wordpress         latest    5fb7d355caa4   8 days ago      685MB
+nginx             latest    e784f4560448   12 days ago     188MB
+bash              latest    9eb4e69a801b   4 months ago    14MB
+amigoscode/2048   latest    82f9808f239f   2 years ago     135MB
+
+```
+now we can see new image called **dashboard**
+
+>0031_Running a container from Custom Image.
+
+Now we have a Custom image, lets run it:
+```
+ ~/Baixades/docker/dashboard $ docker ps -a --format=$FORMAT
+ID	50d92db56098
+NAME	dashboard
+IMAGE	nginx
+PORTS	0.0.0.0:8080->80/tcp
+COMMAND	"/docker-entrypoint.…"
+CREATED	2024-05-16 12:28:11 +0200 CEST
+STATUS	Exited (255) 11 minutes ago
+```
+now run  custom image, dashboard, before remove image running:
+```
+~/Baixades/docker/dashboard $ docker rm -f dashboard       
+dashboard
+```
+before we run a image inside "$PWD:/usr/share/nginx/html":
+```
+~/Baixades/docker/dashboard $ docker run --name dashboard \
+-v "$PWD:/usr/share/nginx/html" -d -p 8080:80 nginx
+
+```
+now we don't need mount de volume any more, **because the custom image contains it**:
+```
+ ~/Baixades/docker/dashboard $ docker run --name dashboard -d -p 8080:80 dashboard
+5f9d4d16ae19da13aa2d1de201285a848fc28dcaf8d21349d5dfd258441bfe7a
+
+ ~/Baixades/docker/dashboard $ docker ps -a --format=$FORMAT                      
+ID	5f9d4d16ae19
+NAME	dashboard
+IMAGE	dashboard
+PORTS	0.0.0.0:8080->80/tcp
+COMMAND	"/docker-entrypoint.…"
+CREATED	2024-05-16 20:01:07 +0200 CEST
+STATUS	Up 38 seconds
+
+```
+Image is dashboard
+
+>0033 Building_ExpresssJS_API
+
+>0034 Dockerfile and Building image for user api
+
+>0035_Running_Container_for_user_api_image
+
+>0036_Exploring_Dockerfiles
+
+![](0036_Exploring_Dockerfiles_1.png)
+
+![](0036_Exploring_Dockerfiles_2.png)
+
+![](0036_Exploring_Dockerfiles_3.png)
+
+![](0036_Exploring_Dockerfiles_4.png)
+
+![](0036_Exploring_Dockerfiles_5.png)
+
+![](0036_Exploring_Dockerfiles_6.png)
+
+>0037_DockerFile_Reference
+
+![](0037_DockerFile_Reference.png)
+
+![](0037_DockerFile_Reference_Format.png)
+
+![](0037_DockerFile_Reference_Examples.png)
+
+Best practices for Dockerfile instructions:
+
+![](0037_DockerFile_Reference_Bes_Practices.png)
+
+>0038_Pulling_Images_using_a_Specifc_Tag
+
+How to pull image, for example postgres, go to dockerhub, search postgres Docker official Images:
+
+![](0038_DockerHub_Pull Image.png)
+
+if we pull :
+```
+docker pull postgres
+
+```
+we pull the latest version:
+
+![](0038_DockerHub_Pull latest Image Postgres.png)
+
+```
+ ~/AAA/IT/amigos_code/docker $  master ± $ docker pull postgres
+Using default tag: latest
+latest: Pulling from library/postgres
+~/AAA/IT/amigos_code/docker $  master ± $ docker images       
+REPOSITORY   TAG       IMAGE ID       CREATED       SIZE
+postgres     latest    cff6b68a194a   12 days ago   432MB
+wordpress    latest    5fb7d355caa4   2 weeks ago   685MB
+
+```
+
+
+>0039_Creating_tags
+
+How made tag version 1 base of latest wordpress:
+```
+$docker tag wordpress:latest wordpress:1
+
+$docker images                          
+REPOSITORY   TAG       IMAGE ID       CREATED       SIZE
+postgres     latest    cff6b68a194a   12 days ago   432MB
+wordpress    1         5fb7d355caa4   2 weeks ago   685MB
+wordpress    latest    5fb7d355caa4   2 weeks ago   685MB
+```
+
+>0040_Creating_Version_2_of_the_Dashboard
+
+>0041_Never_Run_Latest_In_Production
+
+**Never use Latest tag of Images, always use tag with a version**
+
+>0042_Image_Variants
+
+Image Variants or flavors, each designed for a specific use case:
+
+![](0042_Image_Variants_1.png)
+
+![](0042_Image_Variants_2.png)
+
+>0043_Docker_Registries
+
+[DockerHub](https://hub.docker.com/)
+
+[Amazon Elastic Container Registry](https://aws.amazon.com/ecr/)
+
+[GitHub Packages ](https://github.com/features/packages)
+
+>0044_Docker_Login
+```
+$docker login --help          
+Log in to a Docker registry or cloud backend.
+If no registry server is specified, the default is defined by the daemon.
+
+Usage:
+  docker login [OPTIONS] [SERVER] [flags]
+  docker login [command]
+
+Available Commands:
+  azure       Log in to azure
+
+Flags:
+  -h, --help              Help for login
+  -p, --password string   password
+      --password-stdin    Take the password from stdin
+  -u, --username string   username
+
+Use "docker login [command] --help" for more information about a command.
+```
+Usually, use stdin (keyboard):
+```
+$docker login
+
+ask, username and password bay stdin, keyboard...
+
+```
+
+>0045_Docker_push
+
+>0046_Docker_Inspect
+
+Debug Docker, **inspect**:
+```
+$docker inspect --help
+
+Usage:  docker inspect [OPTIONS] NAME|ID [NAME|ID...]
+
+Return low-level information on Docker objects
+
+Options:
+  -f, --format string   Format output using a custom template:
+                        'json':             Print in JSON format
+                        'TEMPLATE':         Print output using the given Go template.
+                        Refer to https://docs.docker.com/go/formatting/ for more
+                        information about formatting output with templates
+  -s, --size            Display total file sizes if the type is container
+      --type string     Return JSON for specified type
+
+```
+```
+$docker ps -a --format=$FORMAT
+ID	5f9d4d16ae19
+NAME	dashboard
+IMAGE	dashboard
+PORTS	0.0.0.0:8080->80/tcp
+COMMAND	"/docker-entrypoint.…"
+CREATED	2024-05-16 20:01:07 +0200 CEST
+STATUS	Exited (255) 6 hours ago
+
+$ docker inspect dashboard     
+[
+    {
+        "Id": "5f9d4d16ae19da13aa2d1de201285a848fc28dcaf8d21349d5dfd258441bfe7a",
+        "Created": "2024-05-16T18:01:07.595853927Z",
+        "Path": "/docker-entrypoint.sh",
+        "Args": [
+            "nginx",
+            "-g",
+            "daemon off;"
+        ],
+        "State": {
+            "Status": "exited
+
+
+...
+
+```
+
+
+>0047_Logs
+
+
+```
+$docker logs --help           
+
+Usage:  docker logs [OPTIONS] CONTAINER
+
+Fetch the logs of a container
+
+Aliases:
+  docker container logs, docker logs
+
+Options:
+      --details        Show extra details provided to logs
+  -f, --follow         Follow log output
+      --since string   Show logs since timestamp (e.g. "2013-01-02T13:23:37Z") or relative
+                       (e.g. "42m" for 42 minutes)
+  -n, --tail string    Number of lines to show from the end of the logs (default "all")
+  -t, --timestamps     Show timestamps
+      --until string   Show logs before a timestamp (e.g. "2013-01-02T13:23:37Z") or
+                       relative (e.g. "42m" for 42 minutes)
+
+```
+use flag -f to see on live the log of the docker:
+```
+$docker logs dashboard -f
+```
+
+>0048_Running_commands_in_Containers
+
+**Run a command in a running container**:
+```
+$docker exec --help          
+
+Usage:  docker exec [OPTIONS] CONTAINER COMMAND [ARG...]
+
+Execute a command in a running container
+
+Aliases:
+  docker container exec, docker exec
+
+Options:
+  -d, --detach               Detached mode: run command in the background
+      --detach-keys string   Override the key sequence for detaching a container
+  -e, --env list             Set environment variables
+      --env-file list        Read in a file of environment variables
+  -i, --interactive          Keep STDIN open even if not attached
+      --privileged           Give extended privileges to the command
+  -t, --tty                  Allocate a pseudo-TTY
+  -u, --user string          Username or UID (format: "<name|uid>[:<group|gid>]")
+  -w, --workdir string       Working directory inside the container
+
+```
+How to look **Environment variables** of an Image, run dashboardpepe:
+```
+docker run --name dashboardpepe -d -p 8080:80 dashboard
+```
+Now lets see images:
+```
+$docker ps -a --format=$FORMAT                          
+ID	8fb6fec21040
+NAME	dashboardpepe
+IMAGE	dashboard
+PORTS	0.0.0.0:8080->80/tcp
+COMMAND	"/docker-entrypoint.…"
+CREATED	2024-05-23 19:37:20 +0200 CEST
+STATUS	Up 7 seconds
+
+ID	5f9d4d16ae19
+NAME	dashboard
+IMAGE	dashboard
+PORTS	0.0.0.0:8080->80/tcp
+COMMAND	"/docker-entrypoint.…"
+CREATED	2024-05-16 20:01:07 +0200 CEST
+STATUS	Exited (255) 6 hours ago
+
+
+```
+lets se enviromental variables,**env**:
+```
+$docker exec dashboardpepe env 
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+HOSTNAME=8fb6fec21040
+NGINX_VERSION=1.25.5
+NJS_VERSION=0.8.4
+NJS_RELEASE=3~bookworm
+PKG_RELEASE=1~bookworm
+HOME=/root
+
+```
+now directories, **env**:
+```
+docker exec dashboardpepe ls 
+bin
+boot
+dev
+docker-entrypoint.d
+docker-entrypoint.sh
+etc
+home
+lib
+lib64
+media
+mnt
+opt
+proc
+root
+run
+sbin
+srv
+sys
+tmp
+usr
+var
+
+```
+run shell inside container using **flag -it**(pwd, ls, cd/, ls, top, df, ctrl+d(to exit)):
+```
+docker exec -it dashboardpepe sh
+# pwd
+/
+# ls
+bin   dev		   docker-entrypoint.sh  home  lib64  mnt  proc  run   srv  tmp  var
+boot  docker-entrypoint.d  etc			 lib   media  opt  root  sbin  sys  usr
+# cd /
+# ls
+bin   dev		   docker-entrypoint.sh  home  lib64  mnt  proc  run   srv  tmp  var
+boot  docker-entrypoint.d  etc			 lib   media  opt  root  sbin  sys  usr
+# top
+sh: 5: top: not found
+# df
+Filesystem     1K-blocks    Used Available Use% Mounted on
+overlay         65739308 2251812  60115720   4% /
+tmpfs              65536       0     65536   0% /dev
+shm                65536       0     65536   0% /dev/shm
+/dev/vda1       65739308 2251812  60115720   4% /etc/hosts
+tmpfs             842096       0    842096   0% /proc/acpi
+tmpfs             842096       0    842096   0% /sys/firmware
+# 
+
+
+What's next?
+  Try Docker Debug for seamless, persistent debugging tools in any container or image → docker debug dashboardpepe
+  Learn more at https://docs.docker.com/go/debug-cli/
+
+
+```
+
+**ctrl+d** to exit shell inside container!!!
+
+>0049_How_to_comunicate_between_containers
+
+![](0049_How_to_comunicate_between_containers.png)
+
+>0050_Docker_Network
+
+```
+$docker network --help           
+
+Usage:  docker network COMMAND
+
+Manage networks
+
+Commands:
+  connect     Connect a container to a network
+  create      Create a network
+  disconnect  Disconnect a container from a network
+  inspect     Display detailed information on one or more networks
+  ls          List networks
+  prune       Remove all unused networks
+  rm          Remove one or more networks
+
+Run 'docker network COMMAND --help' for more information on a command.
+
+
+```
+lets create a network for Mongo Express and mongoDB:
+```
+$docker network create mongo
+64779d4cd085b69fedef9a1ab0d48a8ad9b8f9ceee3d9ea54555e103753fb665
+
+$docker network ls          
+NETWORK ID     NAME      DRIVER    SCOPE
+47ed46efc7a0   bridge    bridge    local
+e2cda59dc980   host      host      local
+64779d4cd085   mongo     bridge    local
+6877c865401e   none      null      local
+
+```
+we can inspect the network created:
+```
+$docker network inspect mongo
+[
+    {
+        "Name": "mongo",
+        "Id": "64779d4cd085b69fedef9a1ab0d48a8ad9b8f9ceee3d9ea54555e103753fb665",
+        "Created": "2024-05-27T14:18:31.606529152Z",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": {},
+            "Config": [
+                {
+                    "Subnet": "172.18.0.0/16",
+                    "Gateway": "172.18.0.1"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Containers": {},
+        "Options": {},
+        "Labels": {}
+    }
+]
+
+```
+![](0050_Docker_Network.png)
+
+>0051_MongoDB_Container
+
+1st, pull mongoDB Image called mongo, and run at port 27017 and network mongo, version of mongo mongo:8.0.0-rc4-jammy:
+```
+$ docker run --name mongo  -d --network mongo -p 27017:27017 \
+	-e MONGO_INITDB_ROOT_USERNAME=rootuser \
+	-e MONGO_INITDB_ROOT_PASSWORD=rootpass mongo:8.0.0-rc4-jammy
+```
+
+look at:
+![](0051_MongoDB_Container_Environmental_Variable.png)
+
+look mongo logs:
+```
+docker logs mongo
+....
+```
+
+**its waiting for connections**, lets **install MongoExpress**
+
+>0052_MongoExpress
+
+Look mongo-express at dockerhub:
+
+![](0052_MongoExpressle.png)
+
+![](0052_MongoExpress_1.png)
+
+we pull version **mongo-express:1.0.2-18-alpine3.19**:
+![](0052_MongoExpress_version.png)
+
+lets run image, name mongo-express, network mongo, port 8081, and environmental variable for username(same as mogodb), password(same as mongodb)and mongodb_server mongo and its image name, mongo-express:
+```
+docker run --name mongo-express --network mongo -d -p 8081:8081 \
+-e ME_CONFIG_MONGODB_ADMINUSERNAME=rootuser \
+-e ME_CONFIG_MONGODB_ADMINPASSWORD=rootpass \
+-e ME_CONFIG_MONGODB_SERVER=mongo mongo-express \
+-e ME_CONFIG_BASICAUTH_USERNAME=sa \
+-e ME_CONFIG_BASICAUTH_PASSWORD=sa \
+```
+now lets see if mongo-express:
+```
+docker logs mongo-express                                        
+Waiting for mongo:27017...
+No custom config.js found, loading config.default.js
+Welcome to mongo-express 1.0.2
+------------------------
+
+
+Mongo Express server listening at http://0.0.0.0:8081
+Server is open to allow connections from anyone (0.0.0.0)
+basicAuth credentials are "admin:pass", it is recommended you change this in your config.js!
+```
+now go to browser and type localhos:8081 (**Mongo Express server listening at http://0.0.0.0:8081**)
+
+>0053_Understanding_Container_Communication
+
+![](0053_Understanding_Container_Communication.png)
+
+>0054_Another_example
+
+>0055_What_is_Docker_Compose
+
+Before, we use 3 commands to create and run 2 containers and create a network to connect them:
+![](0055_What_is_Docker_Compose_1.png)
+
+now we usea **Docker Compose**, is a tool for defining and running multi-container Docker apps using a **yaml file**
+
+>0056_Docker_Compose_cmd
+
+We have **$docker-compose**, and if we install compose V2 we will have **$docker compose**
+
+>0057_Services
+
+lets create a file yml:
+```/AAA/IT/amigos_code  mkdir docker-compose
+$/AAA/IT/amigos_code $ cd docker-compose    
+$ touch docker-compose.yml
+$ ls
+docker-compose.yml
+
+```
+
+at docker-compose.yml:
+```
+services:
+  mongo:
+    image: mongo:8.0.0-rc4-jammy
+    container_name: mongo
+    ports:
+      -27017:27017
+    environment:
+      -MONGO_INITDB_ROOT_USERNAME=amigoscode
+      -MONGO_INITDB_ROOT_PASSWORD=password
+  mongo-express:
+    image: mongo-express
+    container_name: mongo-express
+    ports:
+      -8081:8081
+    environment:
+      -ME_CONFIG_MONGODB_ADMINUSERNAME=amigoscode
+      -ME_CONFIG_MONGODB_ADMINPASSWORD=password
+    depends_on:
+      - mongo
+    restart: always
+
+```
+
+>0058_Docker_Network
+
+add network at docker-compose.yml:
+```
+services:
+  mongo:
+    image: mongo:8.0.0-rc4-jammy
+    container_name: mongo
+    ports:
+      - 27017:27017
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=amigoscode
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    networks:
+      - mongo
+  mongo-express:
+    image: mongo-express
+    container_name: mongo-express
+    ports:
+      - 8081:8081
+    environment:
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=amigoscode
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=password
+      - ME_CONFIG_MONGODB_SERVER=mongo
+      - ME_CONFIG_BASICAUTH_USERNAME=sa
+      - ME_CONFIG_BASICAUTH_PASSWORD=sa
+    depends_on:
+      - mongo
+    restart: always
+    networks:
+      - mongo
+networks:
+  mongo:
+    name: mongo
+ 
+
+```
+
+>0059_Docker_Compose_Up
+
+remove network mongo:
+```
+ docker network rm mongo      
+mongo
+```
+
+now use docker-compose.yml:
+```
+$ll
+total 0
+-rw-rw-r-- 1 pepe pepe 0 de maig  28 11:58 docker-compose.yml
+$docker compose --      
+
+Usage:  docker compose [OPTIONS] COMMAND
+
+Define and run multi-container applications with Docker
+
+Options:
+      --all-resources              Include all resources, even those not used by services
+      --ansi string                Control when to print ANSI control characters ("never"|"alw
+---
+```
+we use **docker compose up**:
+```
+$docker compose up
+
+```
+if we use -d, it runs at background:
+```
+$docker compose up -d   
+[+] Running 3/3
+ ✔ Network mongo            Created                                                                                              0.0s 
+ ✔ Container mongo          Started                                                                                              0.3s 
+ ✔ Container mongo-express  Started  
+ ```                                
+see the neetwork:
+```
+docker network ls      
+NETWORK ID     NAME      DRIVER    SCOPE
+9225a6c7b1b5   bridge    bridge    local
+b6822eadd621   host      host      local
+e8c5bf599232   mongo     bridge    local
+0135d3a72172   none      null      local
+
+```
+
+and the containers:
+
+```
+docker ps -a --format=$FORMAT
+ID	cbce180a1db9
+NAME	mongo-express
+IMAGE	mongo-express
+PORTS	0.0.0.0:8081->8081/tcp
+COMMAND	"/sbin/tini -- /dock…"
+CREATED	2024-05-28 12:32:18 +0200 CEST
+STATUS	Up 2 minutes
+
+ID	dfd4e2fdd881
+NAME	mongo
+IMAGE	mongo:8.0.0-rc4-jammy
+PORTS	0.0.0.0:27017->27017/tcp
+COMMAND	"docker-entrypoint.s…"
+CREATED	2024-05-28 12:32:18 +0200 CEST
+STATUS	Up 2 minutes
+```
+
+>0060_Exploring_docker_compose_commands
+
+lets see containers running:
+```
+docker compose ps   
+NAME            IMAGE                   COMMAND                  SERVICE         CREATED         STATUS         PORTS
+mongo           mongo:8.0.0-rc4-jammy   "docker-entrypoint.s…"   mongo           4 minutes ago   Up 4 minutes   0.0.0.0:27017->27017/tcp
+mongo-express   mongo-express           "/sbin/tini -- /dock…"   mongo-express   4 minutes ago   Up 4 minutes   0.0.0.0:8081->8081/tcp
+
+```
+lets see docker compose ls, list running compose projects:
+```
+docker compose ls
+NAME                STATUS              CONFIG FILES
+docker-compose      running(2)          /home/pepe/AAA/IT/amigos_code/docker/docker-compose/docker-compose.yml
+
+```
+lets see docker compose **stop, start and down**:
+```
+$docker compose stop  
+[+] Stopping 2/2
+ ✔ Container mongo-express  Stopped                                                                                                            0.1s 
+ ✔ Container mongo          Stopped                                                                                                            0.2s 
+$docker compose start
+[+] Running 2/2
+ ✔ Container mongo          Started                                                                                                            0.2s 
+ ✔ Container mongo-express  Started                                                                                                            0.2s 
+$ docker compose down 
+[+] Running 3/3
+ ✔ Container mongo-express  Removed                                                                                                            0.2s 
+ ✔ Container mongo          Removed                                                                                                            0.2s 
+ ✔ Network mongo            Removed                                                              
+
+```
+lets see if network and containers are removed:
+```
+$docker network ls                               
+NETWORK ID     NAME      DRIVER    SCOPE
+9225a6c7b1b5   bridge    bridge    local
+b6822eadd621   host      host      local
+0135d3a72172   none      null      local
+
+$docker ps -a --format=$FORMAT
+Sdocker ps                    
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+
+```
+to run all again, use **docker compose up -d**:
+
+```
+$docker compose up -d
+[+] Running 3/3
+ ✔ Network mongo            Created                                                                                                            0.0s 
+ ✔ Container mongo          Started                                                                                                            0.2s 
+ ✔ Container mongo-express  Started                                                        
+
+```
+
+We use flag -d , to detached mongo and mongo-express it run second plane, if we need see logs of mongo, **view output from containers**:
+
+```
+$docker compose logs mongo -f
+```
+
+
+
+ 
+
+
+
+
