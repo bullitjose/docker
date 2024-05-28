@@ -9,7 +9,10 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=password
     networks:
       - mongo
+    volumes:
+      - data:/data
   mongo-express:
+
     image: mongo-express
     container_name: mongo-express
     ports:
@@ -25,6 +28,10 @@ services:
     restart: always
     networks:
       - mongo
+
+volumes:
+  data: {}
+
 networks:
   mongo:
     name: mongo

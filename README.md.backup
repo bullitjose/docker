@@ -1513,9 +1513,80 @@ We use flag -d , to detached mongo and mongo-express it run second plane, if we 
 $docker compose logs mongo -f
 ```
 
+>0061_Docker_Volume
 
+Docker volume to persist, add volumes at  docker-compose.yml:
+```
+services:
+  mongo:
+    image: mongo:8.0.0-rc4-jammy
+    container_name: mongo
+    ports:
+      - 27017:27017
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=amigoscode
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    networks:
+      - mongo
+    volumes:
+      - data:/data
+  mongo-express:
 
- 
+    image: mongo-express
+    container_name: mongo-express
+    ports:
+      - 8081:8081
+    environment:
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=amigoscode
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=password
+      - ME_CONFIG_MONGODB_SERVER=mongo
+      - ME_CONFIG_BASICAUTH_USERNAME=sa
+      - ME_CONFIG_BASICAUTH_PASSWORD=sa
+    depends_on:
+      - mongo
+    restart: always
+    networks:
+      - mongo
+
+volumes:
+  data: {}
+
+networks:
+  mongo:
+    name: mongo
+
+```
+now rm network and container, and lets up compose again:
+```
+$docker compose up -d         
+[+] Running 2/2
+ ✔ Container mongo          Started                                                                1.0s 
+ ✔ Container mongo-express  Started         
+ ```
+ lets hava a look the new volumes:
+ ```
+ $docker volume ls     
+DRIVER    VOLUME NAME
+local     2b34ee9e1310182602ed129a04c9973e73feb003d2c15b1eb7b81c26776ebce9
+local     2fc6251ed0eacf2e5f320792a4b5f6379488a22404f20dbb09c345fc38890e12
+local     4f138b46a752e97ba1963965537a5840003298faf0c05d773c1be687453ec180
+local     15da86192c89af644d0d419f26f9812cfe52ceb836ae2db4334e9e9525b38fb5
+local     81089a4e6eb199188dd4a924805d56db5006486ad2203b032fdb95256d1d2796
+local     ac2081a257091e94719a34733ff3a548708deb5dac909be530d825fee7794174
+local     acfffb3cbdbc980aea0357d0a11424711fcabe9357aa72059cf0583ac077881e
+local     b9ab96920e8ce5f28290f0bf152f6e308d2a80ae7cecf5cc7da9e6fbc6567700
+local     b47a33d5d7b4c5442c377fee02b2bb2f35da009735cb1a7e107a2c7f2cb6b293
+local     bc11954e78172e65a75852f0e9f40bf37a19a1e2193516f80d704b98b513fb55
+local     d61312e218a5317d7b79e701ff7d98d3b03fee7bd3e9649c09defde1f1fc8a87
+local     d0523909e283feffcb8999d9fc4d3f20c71c2ae510a909cc36f7f04af97404c5
+local     dbdde4a701f2af6b836f1d71e4228fd19bf83f5ca55ae3498bf9d2819734b7e9
+local     docker-compose_data
+local     e5c263f86d50af76d1702bd84791bd9b3f5424131c51d8bf4900702043fab8f7
+local     fd5fbb58219b1dbca3d9806b8aadcb05dcc0f5ecb9d8f9fbd7c9c3bedd1c282b
+
+  ```                 
+
+ theer is a new volume **docker-compose_data**
 
 
 
