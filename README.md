@@ -1573,7 +1573,7 @@ $docker compose up -d
  ```
  lets have a look the new volumes:
  ```
- $docker volume ls     
+ $docker volume ls  
 DRIVER    VOLUME NAME
 local     2b34ee9e1310182602ed129a04c9973e73feb003d2c15b1eb7b81c26776ebce9
 local     2fc6251ed0eacf2e5f320792a4b5f6379488a22404f20dbb09c345fc38890e12
@@ -1595,7 +1595,104 @@ local     fd5fbb58219b1dbca3d9806b8aadcb05dcc0f5ecb9d8f9fbd7c9c3bedd1c282b
   ```                 
 
  there  is a new volume **docker-compose_data**
+ 
+ >0062_Docker_Compose_Documentation
+ 
+ >0063_Docker_scan
+
+Scand is a tool to scan our images for **vulnerabilities**. It uses **snyk**
+[](https://snyk.io/)
+The scan plugin is packaged in a separate package (docker-scan-plugin); depending on "how" you installed, it may not have been installed (as it's an "optional" dependency); can you try: apt-get install docker-scan-plugin
+ 
+If it's installed:
+```
+$docker scan      
+Docker Scan relies upon access to Snyk, a third party provider, do you consent to proceed using Snyk? (y/N)
+y
+Usage:  docker scan [OPTIONS] IMAGE
+
+A tool to scan your images
+
+Options:
+      --accept-license    Accept using a third party scanning provider
+      --dependency-tree   Show dependency tree with scan results
+      --exclude-base      Exclude base image from vulnerability scanning (requires --file)
+  -f, --file string       Dockerfile associated with image, provides more detailed results
+      --group-issues      Aggregate duplicated vulnerabilities and group them to a single one (requires --json)
+      --json              Output results in JSON format
+      --login             Authenticate to the scan provider using an optional token (with --token), or web base token
+                          if empty
+      --reject-license    Reject using a third party scanning provider
+      --severity string   Only report vulnerabilities of provided level or higher (low|medium|high)
+      --token string      Authentication token to login to the third party scanning provider
+      --version           Display version of the scan plugin
+"docker scan" requires exactly 1 argument
 
 
+```
+if we have run compose.yml with mongo and mongo-express:
+
+```
+$docker scan mongo
+failed to get DockerScanID: You need to be logged in to Docker Hub to use the scan feature.
+
+If you are not using Docker Desktop, either
+- use the "docker login" CLI command with a username and password. Note this will not work if
+  2FA is required or if SSO enforcement is enabled on Docker Hub; or
+- use the "docker login" CLI command with a username and Personal Access Token. This requires
+  a token to be generated in advance.
+
+If you are using Docker Desktop: login via the UI or whale menu
+
+```
+**We must be logged to use scan**
+
+>0064_Trivy
+
+[trivy](https://trivy.dev/) 
+
+It's a open **source of snyk**
+
+[installation](https://aquasecurity.github.io/trivy/v0.51/getting-started/installation/)
+
+![](0064_Trivy.png)
+
+lets run trivy with image mongo:
+``` 
+$trivy image mongo
+
+----
+
+$trivy --help     
+Scanner for vulnerabilities in container images, file systems, and Git repositories, as well as for configuration issues and hard-coded secrets
+
+Usage:
+  trivy [global flags] command [flags] target
+  trivy [command]
+  
+Scanning Commands
+  aws         [EXPERIMENTAL] Scan AWS account
+  config      Scan config files for misconfigurations
+  filesystem  Scan local filesystem
+  image       Scan a container image
+  kubernetes  [EXPERIMENTAL] Scan kubernetes cluster
+  repository  Scan a repository
+  rootfs      Scan rootfs
+  sbom        Scan SBOM for vulnerabilities and licenses
+  vm          [EXPERIMENTAL] Scan a virtual machine image
+
+```
+
+
+>0065_Distroless_Images
+
+[distroless Images](https://github.com/GoogleContainerTools/distroless)
+**"Distroless" images** contain only your application and its runtime dependencies. They do not contain package managers, shells or any other programs you would expect to find in a standard Linux distribution. Distroless are **very small**, about a 25% of alpine:
+
+![](0065_Distroless_Images_Docker.png)
+
+>0066_Security_Best_Practices
+
+[Docker security cheat sheet](https://cheatsheetseries.owasp.org/cheatsheets/Docker_Security_Cheat_Sheet.html)
 
 
